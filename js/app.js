@@ -218,7 +218,7 @@ items:items
 
 /* REPLACE WITH YOUR APPS SCRIPT URL */
 
-await fetch("https://script.google.com/macros/s/AKfycbxrZCkQiziKMW7iIMUH9iumFn7dPdkNCZFPokIamOy3hryd25wkMv7DHjHPFk5B4aBL/exec",{
+await fetch("https://script.google.com/macros/s/AKfycbySzrBKplJqXfCd7701RNk1ejgftvdD1Rvxrww_hXRpiFv41o-pJxHRRs6Zny7ZNFFw/exec",{
 
 method:"POST",
 
