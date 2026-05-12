@@ -1,18 +1,20 @@
-const CACHE_NAME = "invoice-receipt-app-v1";
+const CACHE_NAME = "invoice-receipt-app-v2";
 
 const ASSETS_TO_CACHE = [
-  "index.html",
-  "css/style.css",
-  "js/app.js",
-  "manifest.json",
-  "icons/icon-192.png",
-  "icons/icon-512.png"
+  "./",
+  "./index.html",
+  "./css/style.css",
+  "./js/app.js",
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
@@ -21,6 +23,7 @@ self.addEventListener("activate", event => {
       Promise.all(keys.map(key => key !== CACHE_NAME ? caches.delete(key) : null))
     )
   );
+  self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
