@@ -516,10 +516,17 @@ tbody tr:nth-child(even) {
   }
 }
 
+@page {
+  size: A4;
+  margin: 8mm;
+}
+
 @media print {
   body {
     background: #fff;
     padding: 0;
+    margin: 0;
+    font-size: 11px;
   }
 
   .no-print,
@@ -531,9 +538,111 @@ tbody tr:nth-child(even) {
   }
 
   .invoice-sheet {
+    width: 100%;
     max-width: 100%;
     box-shadow: none;
     border-radius: 0;
+  }
+
+  .top-accent {
+    height: 10px;
+  }
+
+  .invoice-header {
+    padding: 18px 24px 12px 24px;
+    gap: 16px;
+  }
+
+  .invoice-header::after {
+    display: none;
+  }
+
+  .brand-row {
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .logo-badge {
+    width: 55px;
+    height: 55px;
+    font-size: 16px;
+    border-bottom-width: 4px;
+    border-radius: 10px;
+  }
+
+  .company-block h1 {
+    font-size: 22px;
+  }
+
+  .tagline,
+  .company-details p {
+    font-size: 11px;
+    margin: 3px 0;
+  }
+
+  .invoice-meta {
+    padding: 14px;
+    border-radius: 10px;
+    border-left-width: 4px;
+  }
+
+  .invoice-meta h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .meta-row {
+    grid-template-columns: 90px 1fr;
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .status-pill {
+    padding: 6px 10px;
+    font-size: 10px;
+    margin-top: 6px;
+  }
+
+  .bill-section,
+  .table-section,
+  .summary-section,
+  .notes-section {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .bill-section {
+    padding-bottom: 10px;
+  }
+
+  .table-section {
+    padding-bottom: 10px;
+  }
+
+  .bill-card,
+  .payment-card,
+  .totals-card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .bill-card h3,
+  .payment-card h3,
+  .notes-section h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .bill-card h3::after,
+  .payment-card h3::after,
+  .notes-section h3::after {
+    height: 3px;
+    width: 35px;
+    margin-top: 4px;
+  }
+
+  .form-grid {
+    gap: 6px;
   }
 
   input,
@@ -543,15 +652,60 @@ tbody tr:nth-child(even) {
     box-shadow: none;
     background: transparent;
     padding: 0;
+    font-size: 11px;
+  }
+
+  table {
+    font-size: 11px;
+  }
+
+  thead th {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  tbody td {
+    padding: 6px;
+  }
+
+  .summary-section {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 14px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+  }
+
+  .payment-card p {
+    line-height: 1.45;
+    font-size: 11px;
+  }
+
+  .total-row {
+    padding: 5px 0;
+  }
+
+  .grand-total {
+    padding: 10px;
+    font-size: 15px;
+    margin-top: 8px;
+  }
+
+  .notes-section {
+    padding-bottom: 12px;
   }
 
   textarea {
-    min-height: auto;
+    min-height: 35px;
+  }
+
+  .footer-accent {
+    height: 10px;
   }
 
   .bill-card,
   .payment-card,
-  .totals-card {
+  .totals-card,
+  table {
     break-inside: avoid;
   }
 }
