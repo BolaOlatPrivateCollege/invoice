@@ -1,5 +1,5 @@
 {
-  "name": "Invoice and Receipt App",
+  "name": "TSN App",
   "short_name": "Invoice App",
   "description": "A clean invoicing and receipt system for The Skilled Network and The Prints Headquarters.",
   "start_url": "./index.html",
