@@ -1,138 +1,205 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice and Receipt App</title>
 
-<title>Invoice Generator</title>
-
-<link rel="stylesheet" href="css/style.css">
-
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#071d49" />
 </head>
 
 <body>
 
-<div class="toolbar">
-
-<label>Select Business</label>
-
-<select id="businessSelect" onchange="loadBusiness()">
-
-<option value="skilled">The Skilled Network</option>
-
-<option value="prints">The Prints Headquarters</option>
-
-</select>
-
-<button onclick="window.print()">Print / Save PDF</button>
-
-</div>
-
-
-
-<div class="invoice">
-
-<h1 class="title">INVOICE</h1>
-
-
-
-<div class="header">
-
-<div class="company">
-
-<h2 id="bizName"></h2>
-
-<p id="bizAddress"></p>
-
-<p>Telephone: <span id="bizPhone"></span></p>
-
-<p>TIN: <span id="bizTax"></span></p>
-
-</div>
-
-
-
-<div class="invoiceDetails">
-
-<label>Invoice Number</label>
-<input id="invoiceNumber" readonly>
-
-<label>Invoice Date</label>
-<input type="date" id="date">
-
-<label>Due Date</label>
-<input type="date" id="dueDate">
-
-</div>
-
-</div>
-
-
-
-<div class="billto">
-
-<h3>BILL TO</h3>
-
-<input id="clientName" placeholder="Client name">
-
-</div>
-
-
-
-<table id="items">
-
-<thead>
-
-<tr>
-
-<th>Description</th>
-
-<th>Qty</th>
-
-<th>Price (NGN)</th>
-
-<th>Amount</th>
-
-</tr>
-
-</thead>
-
-<tbody id="itemRows"></tbody>
-
-</table>
-
-
-
-<button onclick="addRow()">+ Add Item</button>
-
-
-
-<div class="totals">
-
-<h2>Total: NGN <span id="total">0</span></h2>
-
-</div>
-
-
-
-<button class="saveBtn" onclick="saveInvoice()">Save Invoice</button>
-
-
-
-<div class="payment">
-
-<h3>Bank Details</h3>
-
-<p id="bank1"></p>
-
-</div>
-
-
-
-</div>
-
-
-
-<script src="js/app.js"></script>
-
+  <div class="toolbar no-print">
+    <div class="toolbar-left">
+      <label for="businessSelect">Select Business</label>
+      <select id="businessSelect" onchange="loadBusiness()">
+        <option value="skilled">The Skilled Network</option>
+        <option value="prints">The Prints Headquarters</option>
+      </select>
+    </div>
+
+    <div class="toolbar-right">
+      <button type="button" class="btn gold" onclick="addRow()">+ Add Item</button>
+      <button type="button" class="btn dark" onclick="saveInvoice()">Save Invoice</button>
+      <button type="button" class="btn green" onclick="openPaymentModal()">Confirm Payment / Receipt</button>
+      <button type="button" class="btn light" onclick="window.print()">Print / Save PDF</button>
+      <button type="button" class="btn danger" onclick="clearForm()">Clear</button>
+    </div>
+  </div>
+
+  <main class="invoice-sheet" id="invoiceSheet">
+    <div class="top-accent"></div>
+
+    <section class="invoice-header">
+      <div class="company-block">
+        <div class="brand-row">
+          <div class="logo-badge" id="bizLogo">TSN</div>
+          <div>
+            <h1 id="bizName">The Skilled Network</h1>
+            <p class="tagline">Creative Solutions. Proven Results.</p>
+          </div>
+        </div>
+
+        <div class="company-details">
+          <p id="bizAddress"></p>
+          <p>Phone: <span id="bizPhone"></span></p>
+          <p>TIN: <span id="bizTax"></span></p>
+          <p>Currency: <span id="bizCurrency"></span></p>
+        </div>
+      </div>
+
+      <div class="invoice-meta">
+        <h2>INVOICE</h2>
+
+        <div class="meta-row">
+          <span>Invoice No.</span>
+          <input id="invoiceNumber" value="Auto-generated on save" readonly />
+        </div>
+
+        <div class="meta-row">
+          <span>Invoice Date</span>
+          <input type="date" id="date" />
+        </div>
+
+        <div class="meta-row">
+          <span>Due Date</span>
+          <input type="date" id="dueDate" />
+        </div>
+
+        <div class="status-pill unpaid" id="paymentStatus">UNPAID</div>
+      </div>
+    </section>
+
+    <section class="bill-section">
+      <div class="bill-card">
+        <h3>BILL TO</h3>
+
+        <div class="form-grid">
+          <input id="clientName" placeholder="Client / Company Name" />
+          <input id="clientPhone" placeholder="Client Phone Number" />
+          <input id="clientEmail" placeholder="Client Email" />
+          <input id="clientAddress" placeholder="Client Address" />
+        </div>
+      </div>
+    </section>
+
+    <section class="table-section">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="qty-col">Qty</th>
+            <th class="price-col">Unit Price</th>
+            <th class="amount-col">Amount</th>
+            <th class="action-col no-print">Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="itemRows"></tbody>
+      </table>
+    </section>
+
+    <section class="summary-section">
+      <div class="payment-card">
+        <h3>PAYMENT DETAILS</h3>
+        <p id="bank1"></p>
+      </div>
+
+      <div class="totals-card">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <strong>NGN <span id="subtotal">0.00</span></strong>
+        </div>
+
+        <div class="total-row inline-input">
+          <span>Discount</span>
+          <div class="mini-input-wrap">
+            <input type="number" id="discount" min="0" value="0" />
+            <small>%</small>
+          </div>
+        </div>
+
+        <div class="total-row inline-input">
+          <span>Tax</span>
+          <div class="mini-input-wrap">
+            <input type="number" id="tax" min="0" value="0" />
+            <small>%</small>
+          </div>
+        </div>
+
+        <div class="total-row">
+          <span>Amount Paid</span>
+          <strong>NGN <span id="amountPaidDisplay">0.00</span></strong>
+        </div>
+
+        <div class="total-row">
+          <span>Balance</span>
+          <strong>NGN <span id="balanceDisplay">0.00</span></strong>
+        </div>
+
+        <div class="grand-total">
+          <span>Total Due</span>
+          <span>NGN <span id="total">0.00</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="notes-section">
+      <h3>NOTES</h3>
+      <textarea id="notes" placeholder="Thank you for your business."></textarea>
+    </section>
+
+    <div class="footer-accent"></div>
+  </main>
+
+  <div class="modal-backdrop no-print" id="paymentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Confirm Payment</h2>
+        <button type="button" class="modal-close" onclick="closePaymentModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <label for="paymentDate">Payment Date</label>
+        <input type="date" id="paymentDate" />
+
+        <label for="amountPaid">Amount Paid</label>
+        <input type="number" id="amountPaid" min="0" placeholder="Enter amount paid" />
+
+        <label for="paymentMethod">Payment Method</label>
+        <select id="paymentMethod">
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cash">Cash</option>
+          <option value="POS">POS</option>
+          <option value="Cheque">Cheque</option>
+          <option value="Online Payment">Online Payment</option>
+        </select>
+
+        <label for="receivedBy">Received By</label>
+        <input id="receivedBy" placeholder="Name of receiver" />
+
+        <label for="paymentNote">Payment Note</label>
+        <textarea id="paymentNote" placeholder="Optional payment note"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn light" onclick="closePaymentModal()">Cancel</button>
+        <button type="button" class="btn green" onclick="confirmPaymentAndGenerateReceipt()">Generate Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("service-worker.js");
+      });
+    }
+  </script>
 </body>
 </html>
