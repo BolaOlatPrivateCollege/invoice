@@ -14,7 +14,7 @@ tax:"33758764-0001",
 
 currency:"NGN",
 
-bank1:"Account Name: The Skilled Network | Bank: KUDA MFB | Account Number: 3003119258"
+bank1:"Account Name: The Skilled Network | Bank: KUDA MFB | Account Number: 3003119258 or Account Name: The Skilled Network | Bank: OPAY MFB | Account Number: 6142242536"
 
 },
 
