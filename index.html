@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TSN Invoice APP</title>
+  <title>TSN Invoice App</title>
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#071d49" />
 </head>
 
@@ -31,6 +31,7 @@
       <button type="button" class="btn dark" onclick="saveInvoice()">Save Invoice</button>
       <button type="button" class="btn green" onclick="openPaymentModal()">Confirm Payment / Receipt</button>
       <button type="button" class="btn light" onclick="window.print()">Print / Save PDF</button>
+      <button type="button" class="btn dark" id="installAppBtn" style="display:none;">Install App</button>
       <button type="button" class="btn danger" onclick="clearForm()">Clear</button>
     </div>
   </div>
@@ -197,14 +198,50 @@
     </div>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="./js/app.js"></script>
 
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("service-worker.js");
+        navigator.serviceWorker.register("./service-worker.js");
       });
     }
   </script>
+
+  <script>
+    let deferredInstallPrompt = null;
+    const installButton = document.getElementById("installAppBtn");
+
+    window.addEventListener("beforeinstallprompt", function (event) {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+
+      if (installButton) {
+        installButton.style.display = "inline-block";
+      }
+    });
+
+    if (installButton) {
+      installButton.addEventListener("click", async function () {
+        if (!deferredInstallPrompt) {
+          alert("Install is not available yet. Make sure the app is opened from HTTPS or localhost, not directly from a file.");
+          return;
+        }
+
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installButton.style.display = "none";
+      });
+    }
+
+    window.addEventListener("appinstalled", function () {
+      if (installButton) {
+        installButton.style.display = "none";
+      }
+      deferredInstallPrompt = null;
+    });
+  </script>
+
 </body>
 </html>
