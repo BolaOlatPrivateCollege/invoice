@@ -34,6 +34,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhJUP9XeP1PDBaDHD9Y
 
 let invoiceSaved = false;
 let currentInvoiceId = "";
+let loadedInvoiceMode = false;
 let currentPaymentStatus = "Unpaid";
 let currentAmountPaid = 0;
 
@@ -64,7 +65,7 @@ function loadBusiness() {
   document.getElementById("bank1").innerText = biz.bank1;
   document.getElementById("bizLogo").innerText = biz.prefix;
 
-  if (!invoiceSaved) {
+  if (!invoiceSaved && !loadedInvoiceMode) {
     document.getElementById("invoiceNumber").value = "Auto-generated on save";
     currentInvoiceId = "";
     currentAmountPaid = 0;
@@ -253,7 +254,7 @@ async function postToScript(payload) {
 }
 
 async function saveInvoice() {
-  if (invoiceSaved) {
+  if (invoiceSaved || loadedInvoiceMode) {
     alert("This invoice has already been saved. Clear the form to create a new invoice.");
     return;
   }
@@ -623,6 +624,99 @@ function printReceipt(receipt) {
   receiptWindow.document.close();
 }
 
+
+async function loadOldInvoice() {
+  const invoiceId = document.getElementById("searchInvoiceId").value.trim();
+
+  if (!invoiceId) {
+    alert("Please enter an invoice number to load.");
+    return;
+  }
+
+  try {
+    const url = `${SCRIPT_URL}?action=getInvoice&invoiceId=${encodeURIComponent(invoiceId)}`;
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (result.status !== "success") {
+      throw new Error(result.message || "Invoice not found.");
+    }
+
+    populateInvoiceFromSavedData(result.invoice, result.items || []);
+    alert("Invoice loaded successfully.");
+
+  } catch (error) {
+    console.error(error);
+    alert("Could not load invoice. Please check the invoice number and try again.");
+  }
+}
+
+function populateInvoiceFromSavedData(invoice, items) {
+  loadedInvoiceMode = true;
+  invoiceSaved = true;
+  currentInvoiceId = invoice.invoiceId || "";
+
+  const businessKey = invoice.businessKey || "skilled";
+  document.getElementById("businessSelect").value = businessKey;
+
+  const biz = businesses[businessKey] || businesses.skilled;
+  document.getElementById("bizName").innerText = biz.name;
+  document.getElementById("bizAddress").innerText = biz.address;
+  document.getElementById("bizPhone").innerText = biz.phone;
+  document.getElementById("bizTax").innerText = biz.tax;
+  document.getElementById("bizCurrency").innerText = biz.currency;
+  document.getElementById("bank1").innerText = biz.bank1;
+  document.getElementById("bizLogo").innerText = biz.prefix;
+
+  document.getElementById("invoiceNumber").value = invoice.invoiceId || "";
+  document.getElementById("clientName").value = invoice.client || "";
+  document.getElementById("clientPhone").value = invoice.clientPhone || "";
+  document.getElementById("clientEmail").value = invoice.clientEmail || "";
+  document.getElementById("clientAddress").value = invoice.clientAddress || "";
+  document.getElementById("date").value = invoice.date || "";
+  document.getElementById("dueDate").value = invoice.dueDate || "";
+  document.getElementById("discount").value = Number(invoice.discountPercent) || 0;
+  document.getElementById("tax").value = Number(invoice.taxPercent) || 0;
+  document.getElementById("notes").value = invoice.notes || "";
+
+  currentAmountPaid = Number(invoice.amountPaid) || 0;
+  updatePaymentStatus(invoice.paymentStatus || "Unpaid");
+
+  document.getElementById("itemRows").innerHTML = "";
+
+  if (items.length === 0) {
+    addRow();
+  } else {
+    items.forEach(item => addLoadedItemRow(item));
+  }
+
+  calculate();
+}
+
+function addLoadedItemRow(item) {
+  const table = document.getElementById("itemRows");
+  const row = table.insertRow();
+
+  row.innerHTML = `
+    <td><input class="desc" placeholder="Item description" value="${escapeHtml(item.description || "")}"></td>
+    <td><input type="number" min="0" class="qty" placeholder="0" value="${Number(item.qty) || 0}"></td>
+    <td><input type="number" min="0" class="price" placeholder="0.00" value="${Number(item.price) || 0}"></td>
+    <td class="amount-cell">${formatMoney(Number(item.amount) || 0)}</td>
+    <td class="no-print">
+      <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+    </td>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+
 function clearForm() {
   const confirmClear = confirm("Are you sure you want to clear this invoice form?");
 
@@ -641,6 +735,7 @@ function clearForm() {
 
   currentAmountPaid = 0;
   invoiceSaved = false;
+  loadedInvoiceMode = false;
   currentInvoiceId = "";
 
   setTodayDates();
