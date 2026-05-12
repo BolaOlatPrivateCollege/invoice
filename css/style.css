@@ -35,11 +35,21 @@ body {
 }
 
 .toolbar-left,
-.toolbar-right {
+.toolbar-right,
+.toolbar-search {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.toolbar-search {
+  flex: 1 1 320px;
+  justify-content: center;
+}
+
+.toolbar-search input {
+  max-width: 330px;
 }
 
 label {
